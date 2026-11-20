@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'maven-publish' // <-- Добавили для вкладки Packages
+    id 'maven-publish'
 }
 
 group = 'org.example'
@@ -12,19 +12,24 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Используем конкретную, стабильную версию JUnit
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 }
 
-test {
+// Принудительно указываем Gradle, как запускать тесты
+tasks.named('test') {
     useJUnitPlatform()
+    // Вот эта магия заставляет Gradle видеть Launcher:
+    systemProperty 'junit.platform.launcher', 'org.junit.platform.launcher.core.LauncherFactory'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-// Блок для публикации в GitHub Packages
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -34,7 +39,6 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            // ВАЖНО: Проверь ссылку, тут должен быть твой ник!
             url = uri("https://maven.pkg.github.com/steffanxx/TodoApp")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
