@@ -27,18 +27,13 @@ jobs:
       - name: Build and Test
         run: ./gradlew build
 
-      - name: Publish to GitHub Packages
-        run: ./gradlew publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Публикация убрана, чтобы не было ошибки 422
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: Release v1.0.${{ github.run_number }}
-          draft: false
-          prerelease: false
           files: build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
