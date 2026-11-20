@@ -1,16 +1,19 @@
 plugins {
     id 'java'
     id 'application'
+    id 'maven-publish' // <-- Добавили для вкладки Packages
 }
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    // ЭТА СТРОЧКА ЛЕЧИТ ТВОЮ ОШИБКУ (нужна для новых версий Gradle)
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
@@ -19,4 +22,24 @@ test {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// Блок для публикации в GitHub Packages
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            // ВАЖНО: Проверь ссылку, тут должен быть твой ник!
+            url = uri("https://maven.pkg.github.com/steffanxx/TodoApp")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
